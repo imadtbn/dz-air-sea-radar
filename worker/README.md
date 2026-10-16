@@ -21,3 +21,8 @@ Inspect and comply with https://api.adsb.lol/docs and https://www.adsb.lol/terms
 Cloudflare Worker uploaded and workers.dev route enabled: https://dz-air-sea-aircraft-api.imadtbn-prayer.workers.dev/health . Health endpoint was verified via a remote browser and returned `{ "status": "ready", "upstream_enabled": false }`. Upstream data forwarding remains **disabled pending explicit production-use permission**. Website is not configured to use this Worker yet; the live ADSB.lol browser endpoint still displays an unavailable-data error in the tested sessions. Cloudflare remote browser successfully loaded the site/map at 390×844 mobile and 1440×900 desktop viewports, but aircraft requests failed; no real aircraft markers were confirmed. A request for permitted use has been saved as a Gmail draft addressed to info@adsb.lol and has NOT been sent.
 
 Do not claim the aircraft radar is production-ready until the provider grants permission, Worker is activated, and API payloads are verified end-to-end from mobile and desktop.
+
+
+## Weather API
+
+`GET /api/metar?icao=DAAG` (DAAG, DAOO, DABC, DABB, DAAE, DAON) retrieves a METAR JSON observation from Aviation Weather Center with a 10-minute edge cache, validated ICAO and sanitized data. Weather works even while aircraft upstream is disabled, subject to real upstream availability. Credit: Aviation Weather Center; see https://aviationweather.gov/data/api/ (100 requests/minute upstream limit).
