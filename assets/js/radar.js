@@ -20,6 +20,7 @@ function changeMode(value){
  mode=value;document.querySelectorAll("[data-mode]").forEach(b=>{let yes=b.dataset.mode===value;b.classList.toggle("is-active",yes);b.setAttribute("aria-pressed",String(yes));});
  markers.forEach(({place,marker})=>{marker.getElement().style.display=(mode==="both"||place.type===mode)?"":"none";});
  entries();
+ if(ready)renderFlights();
 }
 function popup(p){
  const div=document.createElement("div");div.dir="rtl";
@@ -75,8 +76,90 @@ async function start(){
   api=await import("https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.mjs");
   map=new api.Map({container:"map",style:"https://tiles.openfreemap.org/styles/liberty",center:[2.8,33.7],zoom:4.8,minZoom:1.1,maxZoom:17});
   const watchdog=setTimeout(()=>{if(!ready){$("mapLoading").hidden=true;$("mapError").hidden=false;}},18000);
-  map.once("load",()=>{ready=true;clearTimeout(watchdog);$("mapLoading").hidden=true;initMarkers();if(initial)focusPlace(initial,true);map.resize();});
+  map.once("load",()=>{ready=true;clearTimeout(watchdog);$("mapLoading").hidden=true;initMarkers();initAirRadar();if(initial)focusPlace(initial,true);map.resize();});
   window.addEventListener("resize",()=>map.resize());
  }catch(err){console.error("Map initialization failed",err);$("mapLoading").hidden=true;$("mapError").hidden=false;}
 }
 start();
+// Phase 2: live observed aircraft. No fabricated tracks; fetch is throttled per tab.
+// ADSB.lol radius endpoint uses nautical miles. Browser requests require upstream CORS.
+const aircraftMarkers=new Map();let aircraft=[],lastFetch=0,airSeq=0;
+const AIR_URL="https://api.adsb.lol/v2/lat/";
+const num=v=>typeof v==="number"&&Number.isFinite(v);
+const speed=v=>num(v)?Math.round(v*1.852)+" كم/سا":"غير متاح";
+const height=v=>v==="ground"?"على الأرض":num(v)?Math.round(v*0.3048)+" م":"غير متاح";
+const bearing=v=>num(v)?Math.round((v+360)%360)+"°":"غير متاح";
+function flightCard(p){
+ const box=document.createElement("div");box.className="flight-popup";box.dir="rtl";
+ const title=document.createElement("h3");title.textContent=p.flight||p.hex;
+ const subtitle=document.createElement("p");subtitle.textContent="ADS-B.lol · "+p.hex.toUpperCase();
+ box.append(title,subtitle);
+ [["السرعة",speed(p.gs)],["الارتفاع",height(p.alt_baro??p.alt_geom)],["الاتجاه",bearing(p.track)],["آخر رصد",Math.round(p.seen)+" ثانية"]].forEach(([name,value])=>{
+ const line=document.createElement("div");line.className="flight-line";
+ const a=document.createElement("span"),b=document.createElement("strong");a.textContent=name;b.textContent=value;line.append(a,b);box.append(line);
+ });
+ const note=document.createElement("small");note.textContent="رصد تقريبي، لا يصلح للملاحة.";box.append(note);return box;
+}
+function renderFlights(){
+ const visible=$("airVisibility").checked&&mode!=="sea";
+ const ids=new Set();
+ for(const p of aircraft){
+  ids.add(p.hex);let item=aircraftMarkers.get(p.hex);
+  if(!item){
+   const el=document.createElement("button");el.className="aircraft-marker";el.type="button";el.textContent="✈";el.title=p.flight||p.hex;
+   const marker=new api.Marker({element:el,anchor:"center"}).setLngLat([p.lon,p.lat]).addTo(map);
+   item={marker,p};aircraftMarkers.set(p.hex,item);
+   el.addEventListener("click",()=>{const current=aircraftMarkers.get(p.hex);if(current){current.marker.setPopup(new api.Popup({offset:22}).setDOMContent(flightCard(current.p)));current.marker.togglePopup();}});
+  }
+  item.p=p;item.marker.setLngLat([p.lon,p.lat]);
+  const node=item.marker.getElement();node.style.display=visible?"":"none";
+  node.style.setProperty("--air-bearing",num(p.track)?((p.track+360)%360)+"deg":"0deg");
+ }
+ for(const [id,item] of aircraftMarkers){if(!ids.has(id)){item.marker.remove();aircraftMarkers.delete(id);}}
+ $("airCount").textContent=String(aircraft.length);$("airResults").replaceChildren();
+ if(!aircraft.length){$("airResults").textContent="لا توجد طائرات بموقع حديث متاح.";return;}
+ for(const p of aircraft.slice(0,35)){
+  const b=document.createElement("button");b.className="flight-result";b.type="button";
+  const name=document.createElement("strong");name.textContent=p.flight||p.hex.toUpperCase();
+  const detail=document.createElement("small");detail.textContent=speed(p.gs)+" · "+height(p.alt_baro??p.alt_geom);
+  b.append(name,detail);b.addEventListener("click",()=>{
+   map.flyTo({center:[p.lon,p.lat],zoom:Math.max(7,map.getZoom()),essential:true});
+   const m=aircraftMarkers.get(p.hex)?.marker;if(m){m.setPopup(new api.Popup({offset:22}).setDOMContent(flightCard(p)));m.togglePopup();}
+  });$("airResults").append(b);
+ }
+}
+function showAirStatus(message,ok=false){
+ $("airStatusText").textContent=message;$("airSummary").textContent=message;
+ $("airStatus").querySelector(".status-dot").className="status-dot "+(ok?"air-online":"amber");
+}
+async function refreshFlights(){
+ if(!ready||document.hidden||mode==="sea"||!$("airVisibility").checked)return;
+ if(Date.now()-lastFetch<60000)return;lastFetch=Date.now();
+ const id=++airSeq,center=map.getCenter();
+ if(Math.abs(center.lat)>89)return;
+ showAirStatus("جارٍ جلب الرصد حول مركز الخريطة…");
+ const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),12000);
+ try{
+  const url=AIR_URL+center.lat.toFixed(3)+"/lon/"+center.lng.toFixed(3)+"/dist/250";
+  const response=await fetch(url,{signal:controller.signal,cache:"no-store",headers:{Accept:"application/json"}});
+  if(!response.ok)throw Error("ADS-B HTTP "+response.status);
+  const payload=await response.json();if(id!==airSeq)return;
+  if(!Array.isArray(payload.ac))throw Error("Invalid ADS-B payload");
+  aircraft=payload.ac.filter(p=>typeof p.hex==="string"&&num(p.lat)&&num(p.lon)&&num(p.seen_pos??p.seen)&&(p.seen_pos??p.seen)<=120&&(p.seen_pos??p.seen)>=0).slice(0,350).map(p=>({...p,flight:String(p.flight||"").trim().slice(0,20),seen:p.seen_pos??p.seen}));
+  renderFlights();
+  $("airUpdated").textContent="آخر جلب: "+new Date().toLocaleTimeString("ar-DZ");
+  showAirStatus("رُصدت "+aircraft.length+" طائرة ضمن 250 ميلًا بحريًا من مركز الخريطة",true);
+ }catch(error){
+  if(id!==airSeq)return;
+  aircraft=[];renderFlights();$("airCount").textContent="—";
+  showAirStatus("بيانات الطائرات غير متاحة؛ تحقق من الاتصال أو قيود CORS/المصدر.");
+  console.warn(error);
+ }finally{clearTimeout(timeout);}
+}
+function initAirRadar(){
+ $("airRefresh").addEventListener("click",refreshFlights);
+ $("airVisibility").addEventListener("change",()=>{renderFlights();if($("airVisibility").checked)refreshFlights();});
+ map.on("moveend",refreshFlights);
+ document.addEventListener("visibilitychange",()=>{if(!document.hidden)refreshFlights();});
+ setInterval(refreshFlights,60000);refreshFlights();
+}
