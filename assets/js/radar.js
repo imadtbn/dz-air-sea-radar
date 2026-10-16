@@ -140,7 +140,8 @@ async function refreshFlights(){
  showAirStatus("جارٍ جلب الرصد حول مركز الخريطة…");
  const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),12000);
  try{
-  const url=AIR_URL+center.lat.toFixed(3)+"/lon/"+center.lng.toFixed(3)+"/dist/250";
+  const gateway=window.DZ_AIR_API || "";
+  const url=gateway ? gateway+"?lat="+encodeURIComponent(center.lat.toFixed(3))+"&lon="+encodeURIComponent(center.lng.toFixed(3)) : AIR_URL+center.lat.toFixed(3)+"/lon/"+center.lng.toFixed(3)+"/dist/250";
   const response=await fetch(url,{signal:controller.signal,cache:"no-store",headers:{Accept:"application/json"}});
   if(!response.ok)throw Error("ADS-B HTTP "+response.status);
   const payload=await response.json();if(id!==airSeq)return;
