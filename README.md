@@ -91,3 +91,10 @@ sitemap.xml
 تمت إضافة `worker/worker.js` كوسيط Cloudflare *مجهز وغير منشور* ومغلق افتراضيًا ريثما تتحقق موافقة المزود على استخدام الإنتاج. لا تضبط `UPSTREAM_ALLOWED=true` قبل الموافقة. لتوجيه الموقع إلى الوسيط بعد نشره عدل `assets/js/air-config.js` بالرابط الفعلي؛ عند تركه فارغًا يستعمل الموقع المسار المباشر السابق. يوفر الوسيط تحققًا للإحداثيات و CORS للمنشأ المعروف وتخزينًا مؤقتًا 60 ثانية لكل منطقة تقريبية 0.25 درجة.
 
 **حالة الاختبار:** لم يتيسر تأكيد طلب حقيقي من ADS-B أو فتح الموقع من هاتف/حاسوب متصلين بالإنترنت في بيئة التنفيذ. يجب تنفيذ اختبار المتصفح الفعلي بعد السماح بالوصول، والتحقق من رموز HTTP وأعمار الرصد ورسائل الخطأ ومعدلات الطلبات. وجود ملفات الوسيط لا يعني أنه نشط.
+
+
+## Test and deployment status — 2026-10-16
+
+Cloudflare Worker uploaded and workers.dev route enabled: https://dz-air-sea-aircraft-api.imadtbn-prayer.workers.dev/health . Health endpoint was verified via a remote browser and returned `{ "status": "ready", "upstream_enabled": false }`. Upstream data forwarding remains **disabled pending explicit production-use permission**. Website is not configured to use this Worker yet; the live ADSB.lol browser endpoint still displays an unavailable-data error in the tested sessions. Cloudflare remote browser successfully loaded the site/map at 390×844 mobile and 1440×900 desktop viewports, but aircraft requests failed; no real aircraft markers were confirmed. A request for permitted use has been saved as a Gmail draft addressed to info@adsb.lol and has NOT been sent.
+
+Do not claim the aircraft radar is production-ready until the provider grants permission, Worker is activated, and API payloads are verified end-to-end from mobile and desktop.
