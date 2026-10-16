@@ -146,7 +146,10 @@ async function refreshFlights(){
   const gateway=window.DZ_AIR_API || "";
   const url=gateway ? gateway+"?lat="+encodeURIComponent(center.lat.toFixed(3))+"&lon="+encodeURIComponent(center.lng.toFixed(3)) : AIR_URL+center.lat.toFixed(3)+"/lon/"+center.lng.toFixed(3)+"/dist/250";
   const response=await fetch(url,{signal:controller.signal,cache:"no-store",headers:{Accept:"application/json"}});
-  if(!response.ok)throw Error("ADS-B HTTP "+response.status);
+  if(!response.ok){
+   if(response.status===503){const detail=await response.json().catch(()=>({}));if(detail.error==="UPSTREAM_NOT_AUTHORIZED")throw Error("UPSTREAM_NOT_AUTHORIZED");}
+   throw Error("ADS-B HTTP "+response.status);
+  }
   const payload=await response.json();if(id!==airSeq)return;
   if(!Array.isArray(payload.ac))throw Error("Invalid ADS-B payload");
   airFailedUntil=0;
@@ -158,7 +161,7 @@ async function refreshFlights(){
   if(id!==airSeq)return;
   aircraft=[];renderFlights();$("airCount").textContent="—";
   airFailedUntil=Date.now()+5*60*1000;
-  showAirStatus("تعذر الاتصال بمصدر الطائرات؛ أوقفنا المحاولات التلقائية 5 دقائق لحماية الخدمة. راجع فحص الاتصال.");
+  showAirStatus(error.message==="UPSTREAM_NOT_AUTHORIZED"?"الرادار الجوي متوقف إلى حين السماح بالاستخدام العام من مزوّد ADS-B.":"تعذر الاتصال بمصدر الطائرات؛ أوقفنا المحاولات التلقائية 5 دقائق لحماية الخدمة. راجع فحص الاتصال.");
   console.warn(error);
  }finally{clearTimeout(timeout);}
 }
