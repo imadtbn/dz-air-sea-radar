@@ -11,8 +11,9 @@ const probes=[
  }},
  {id:"pwa",title:"قابلية عمل PWA",run:async()=>{
    if(!("serviceWorker" in navigator))throw Error("Service Worker غير مدعوم");
-   const registration=await navigator.serviceWorker.getRegistration("./");
-   if(!registration)throw Error("التطبيق لم يسجل Service Worker بعد. افتح الموقع عبر HTTPS وحاول مجددًا.");
+   const registration=await navigator.serviceWorker.register("./sw.js");
+   if(!registration)throw Error("تعذر إنشاء تسجيل Service Worker.");
+   if(!registration.active && !registration.waiting)return "تم بدء تسجيل PWA، وما تزال الملفات الثابتة قيد التهيئة. أعد الفحص.";
    return "خدمة الملفات الثابتة مسجلة. تثبيت التطبيق يتوقف على المتصفح وشروطه.";
  }},
  {id:"storage",title:"تخزين المفضلة",run:async()=>{
@@ -67,7 +68,7 @@ async function runTests(){
  for(const p of probes){
   const {article,status}=rows.get(p.id);
   article.dataset.state="busy";status.textContent="جارٍ الاتصال…";
-  try{const message=await p.run();article.dataset.state=p.id==="air"&&message.startsWith("الاتصال ADS-B غير")?"pending":"ok";status.textContent=message;}
+  try{const message=await p.run();article.dataset.state=(p.id==="air"&&message.startsWith("الاتصال ADS-B غير"))||(p.id==="marine"&&message.startsWith("غير مفعّل"))||(p.id==="pwa"&&message.startsWith("تم بدء تسجيل PWA"))?"pending":"ok";status.textContent=message;}
   catch(e){article.dataset.state="error";status.textContent="تعذر الفحص: "+(e.name==="AbortError"?"انتهت مهلة الاتصال":e.message||"خطأ غير معروف");}
  }
  start.disabled=false;start.textContent="إعادة الفحص";
