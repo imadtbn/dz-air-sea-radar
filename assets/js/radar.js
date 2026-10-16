@@ -1,7 +1,8 @@
 import {places,searchPlaces} from "./places.js";
+import {createMarineRadar} from "./marine.js";
 const $=id=>document.getElementById(id);
 const root=$("mapShell"),listing=$("referenceList"),search=$("mapSearch");
-let map,api,markers=[],mode="both",active="",ready=false;
+let map,api,markers=[],mode="both",active="",ready=false,marine=null;
 $("heroPlaceCount").textContent=places.length;
 function notice(message){const node=$("geoMessage");node.textContent=message;node.hidden=false;clearTimeout(notice.timer);notice.timer=setTimeout(()=>node.hidden=true,4500);}
 function entries(){
@@ -21,6 +22,7 @@ function changeMode(value){
  markers.forEach(({place,marker})=>{marker.getElement().style.display=(mode==="both"||place.type===mode)?"":"none";});
  entries();
  if(ready)renderFlights();
+ marine?.setMode(value);
 }
 function popup(p){
  const div=document.createElement("div");div.dir="rtl";
@@ -76,7 +78,7 @@ async function start(){
   api=await import("https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.mjs");
   map=new api.Map({container:"map",style:"https://tiles.openfreemap.org/styles/liberty",center:[2.8,33.7],zoom:4.8,minZoom:1.1,maxZoom:17});
   const watchdog=setTimeout(()=>{if(!ready){$("mapLoading").hidden=true;$("mapError").hidden=false;}},18000);
-  map.once("load",()=>{ready=true;clearTimeout(watchdog);$("mapLoading").hidden=true;initMarkers();initAirRadar();if(initial)focusPlace(initial,true);map.resize();});
+  map.once("load",()=>{ready=true;clearTimeout(watchdog);$("mapLoading").hidden=true;initMarkers();marine=createMarineRadar({map,lib:api});marine.setMode(mode);initAirRadar();if(initial)focusPlace(initial,true);map.resize();});
   window.addEventListener("resize",()=>map.resize());
  }catch(err){console.error("Map initialization failed",err);$("mapLoading").hidden=true;$("mapError").hidden=false;}
 }

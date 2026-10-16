@@ -13,6 +13,39 @@ export default {
   if(request.method==="OPTIONS")return new Response(null,{status:204,headers:{...cors,"access-control-allow-methods":"GET, OPTIONS","access-control-allow-headers":"Accept","access-control-max-age":"600"}});
   if(request.method!=="GET")return json({error:"Method not allowed"},405,{allow:"GET, OPTIONS"});
   if(url.pathname==="/health")return json({status:"ready",upstream_enabled:env.UPSTREAM_ALLOWED==="true"});
+
+  if(url.pathname==="/api/metar"){
+    const code=(url.searchParams.get("icao")||"").toUpperCase();
+    const supported=new Set(["DAAG","DAOO","DABC","DABB","DAAE","DAON"]);
+    if(!supported.has(code))return json({error:"Unsupported ICAO code"},400);
+    const cacheKey=new Request(new URL("/cache/metar?icao="+code,request.url));
+    const cachedWeather=await caches.default.match(cacheKey);
+    if(cachedWeather){
+      const headers=new Headers(cachedWeather.headers);headers.set("x-cache-state","HIT");
+      return new Response(cachedWeather.body,{status:cachedWeather.status,headers});
+    }
+    try{
+      const upstreamUrl="https://aviationweather.gov/api/data/metar?ids="+code+"&format=json";
+      const response=await fetch(upstreamUrl,{headers:{accept:"application/json","user-agent":"DZAirSeaRadar/1.0 (+https://imadtbn.github.io/dz-air-sea-radar/)"}});
+      if(response.status===204)return json({icao:code,available:false,source:"Aviation Weather Center",message:"No recent METAR available."},200);
+      if(!response.ok)return json({error:"Weather source unavailable",status:response.status},502);
+      const body=await response.json();
+      if(!Array.isArray(body)||body.length===0)return json({icao:code,available:false,source:"Aviation Weather Center"},200);
+      const m=body.find(v=>v.icaoId===code)||body[0];
+      const str=v=>typeof v==="string"?v.slice(0,400):null;
+      const val=v=>typeof v==="number"&&Number.isFinite(v)?v:null;
+      const weather={
+        icao:code,available:true,source:"Aviation Weather Center",fetchedAt:new Date().toISOString(),
+        reportTime:typeof m.obsTime==="number"?new Date(m.obsTime*1000).toISOString():str(m.reportTime||m.obsTime),
+        temperatureC:val(m.temp),windDirection:val(m.wdir),windKnots:val(m.wspd),
+        visibilitySM:str(String(m.visib??"")),flightCategory:str(m.fltCat),rawMetar:str(m.rawOb)
+      };
+      const headers={"content-type":"application/json; charset=utf-8","cache-control":"public, max-age=600","access-control-allow-origin":ORIGIN,"x-cache-state":"MISS","x-content-type-options":"nosniff"};
+      const result=new Response(JSON.stringify(weather),{headers});
+      ctx.waitUntil(caches.default.put(cacheKey,result.clone()));
+      return result;
+    }catch(e){return json({error:"Weather fetch failed",message:"Unable to retrieve observation."},502);}
+  }
   if(url.pathname!=="/api/aircraft")return json({error:"Not found"},404);
   if(env.UPSTREAM_ALLOWED!=="true")return json({error:"UPSTREAM_NOT_AUTHORIZED",message:"Upstream relay disabled pending provider permission."},503);
   const rawLat=Number(url.searchParams.get("lat")),rawLon=Number(url.searchParams.get("lon"));

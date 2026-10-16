@@ -2,6 +2,9 @@
 (function () {
   "use strict";
   const paths = {
+    heart:'<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0l-1 1-1-1a5.5 5.5 0 1 0-7.8 7.8L12 21l9.6-8.6a5.5 5.5 0 0 0-.8-7.8z"/>',
+    'share-2':'<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.7 10.6 6.6-4.1m-6.6 8 6.6 3.9"/>',
+    download:'<path d="M12 3v12m-4-4 4 4 4-4M4 17v4h16v-4"/>',
     home:'<path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/>',
     radar:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/><path d="M12 12l6-6"/>',
     plane:'<path d="M17 21v-8l-5-3V3a2 2 0 0 0-4 0v7l-5 3v8l7-2 7 2z" transform="translate(2 0)"/><path d="M4 13l8-3 8 3"/>',
@@ -53,5 +56,10 @@
     document.addEventListener('keydown',function (event) { if (event.key==='Escape') close(); });
     window.addEventListener('resize',function () { if (window.innerWidth>890) close(); });
   }
+  const share=document.querySelector("#sharePage");
+  if(share)share.addEventListener("click",async()=>{const info={title:document.title,url:location.href};try{if(navigator.share)await navigator.share(info);else if(navigator.clipboard){await navigator.clipboard.writeText(info.url);share.title="تم نسخ الرابط";}}catch(e){if(e.name!=="AbortError")console.warn(e);}});
+  if("serviceWorker" in navigator && location.protocol==="https:")window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(console.warn));
+  let installPrompt=null;const installButton=document.querySelector("#installApp");
+  if(installButton){window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();installPrompt=e;installButton.hidden=false;});installButton.addEventListener("click",async()=>{if(!installPrompt)return;installPrompt.prompt();await installPrompt.userChoice;installPrompt=null;installButton.hidden=true;});window.addEventListener("appinstalled",()=>{installButton.hidden=true;});}
   document.querySelectorAll('.current-year').forEach(function (el) { el.textContent=String(new Date().getFullYear()); });
 })();

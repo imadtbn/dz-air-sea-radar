@@ -11,14 +11,14 @@
   <meta property="og:description" content="استكشف المطارات والموانئ الجزائرية على خريطة تفاعلية. عرض الطائرات المرصودة عبر ADS-B مع تفاصيل ووقت آخر رصد.">
   <meta property="og:url" content="https://imadtbn.github.io/dz-air-sea-radar/">
   <link rel="canonical" href="https://imadtbn.github.io/dz-air-sea-radar/">
-  <link rel="icon" href="assets/icons/radar.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="assets/icons/radar.svg"><link rel="icon" href="assets/icons/radar.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://tiles.openfreemap.org" crossorigin>
   <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.css">
   <link rel="stylesheet" href="assets/css/style.css">
   <title>DZ Air & Sea Radar | الرادار الجوي والبحري الجزائري</title>
   <script src="assets/js/site.js" defer></script>
   <script src="assets/js/air-config.js"></script>
-  <script type="module" src="assets/js/radar.js"></script>
+  <script src="assets/js/marine-config.js"></script><script type="module" src="assets/js/radar.js"></script>
 </head>
 <body data-page="home">
 <a class="skip-link" href="#main">تجاوز إلى المحتوى</a>
@@ -33,9 +33,9 @@
       <a href="index.html#radar"><span data-icon="radar"></span>الخريطة</a>
       <a href="airports.html"><span data-icon="plane"></span>المطارات</a>
       <a href="ports.html"><span data-icon="ship"></span>الموانئ</a>
-      <a href="about.html"><span data-icon="info"></span>عن المنصة</a>
+      <a href="favorites.html"><span data-icon="heart"></span>المفضلة</a><a href="about.html"><span data-icon="info"></span>عن المنصة</a>
     </nav>
-    <div class="header-actions">
+    <div class="header-actions"><button id="installApp" type="button" class="icon-button header-install" hidden title="تثبيت التطبيق" aria-label="تثبيت التطبيق"><span data-icon="download"></span></button><button id="sharePage" type="button" class="icon-button header-share" title="مشاركة الصفحة" aria-label="مشاركة الصفحة"><span data-icon="share-2"></span></button>
       <a class="header-link" href="index.html#radar"><span data-icon="map"></span><span>استكشف الرادار</span></a>
       <button class="menu-toggle icon-button" id="menuToggle" type="button" aria-label="فتح القائمة" aria-controls="mainNav" aria-expanded="false"><span data-icon="menu"></span></button>
     </div>
@@ -92,7 +92,7 @@
         </div>
         <div class="map-layout">
           <aside class="map-sidebar" aria-label="البحث عن موقع مرجعي">
-            <div class="air-dashboard"><div class="air-dashboard-head"><strong>✈ الطائرات المرصودة</strong><span id="airCount" class="count-pill">—</span></div><p id="airSummary" aria-live="polite">سيتم تحميل الرصد عند فتح الخريطة.</p><div class="air-dashboard-actions"><span id="airUpdated">آخر تحديث: —</span><button type="button" class="map-text-button" id="airRefresh">تحديث</button></div><label class="air-toggle"><input id="airVisibility" type="checkbox" checked> عرض الطائرات</label><div id="airResults" class="air-results"></div></div><div class="sidebar-heading"><div><span class="sidebar-overline">الدليل الجغرافي</span><h3>اكتشف المواقع</h3></div><span class="sidebar-count" id="locationCount">—</span></div>
+            <div class="air-dashboard"><div class="air-dashboard-head"><strong>✈ الطائرات المرصودة</strong><span id="airCount" class="count-pill">—</span></div><p id="airSummary" aria-live="polite">سيتم تحميل الرصد عند فتح الخريطة.</p><div class="air-dashboard-actions"><span id="airUpdated">آخر تحديث: —</span><button type="button" class="map-text-button" id="airRefresh">تحديث</button></div><label class="air-toggle"><input id="airVisibility" type="checkbox" checked> عرض الطائرات</label><div id="airResults" class="air-results"></div></div><div class="sea-dashboard" id="seaDashboard" hidden><div class="air-dashboard-head"><strong>⛴ السفن المرصودة</strong><span id="seaCount" class="count-pill">—</span></div><p id="seaStatusText">البث البحري غير مفعّل.</p><div class="air-dashboard-actions"><span id="seaUpdated">آخر تحديث: —</span><button type="button" id="seaRefresh" class="map-text-button">تحديث</button></div><div id="seaResults" class="air-results"></div><div id="seaStatus"></div></div><div class="sidebar-heading"><div><span class="sidebar-overline">الدليل الجغرافي</span><h3>اكتشف المواقع</h3></div><span class="sidebar-count" id="locationCount">—</span></div>
             <label for="mapSearch" class="sr-only">ابحث عن مطار أو ميناء أو مدينة</label>
             <div class="search-field"><span data-icon="search"></span><input id="mapSearch" type="search" autocomplete="off" placeholder="ابحث عن مطار، ميناء أو مدينة…"></div>
             <p class="sidebar-hint">اختر موقعًا للانتقال إليه وإظهار معلوماته.</p>
@@ -108,7 +108,7 @@
               <button type="button" class="map-control-button" id="zoomIn" title="تكبير" aria-label="تكبير الخريطة"><span data-icon="plus"></span></button>
               <button type="button" class="map-control-button" id="zoomOut" title="تصغير" aria-label="تصغير الخريطة"><span data-icon="minus"></span></button>
             </div>
-            <div class="map-legend"><span><i class="legend-dot flight"></i> طائرة</span><span><i class="legend-dot air"></i> مطار</span><span><i class="legend-dot sea"></i> ميناء</span></div>
+            <div class="map-legend"><span><i class="legend-dot vessel"></i> سفينة مرصودة</span><span><i class="legend-dot flight"></i> طائرة</span><span><i class="legend-dot air"></i> مطار</span><span><i class="legend-dot sea"></i> ميناء</span></div>
             <div class="map-geo-msg" id="geoMessage" role="status" aria-live="polite" hidden></div>
           </div>
         </div>
@@ -136,5 +136,5 @@
     </div>
   </section>
 </main>
-<footer class="site-footer"><div class="container footer-top"><div><a class="brand footer-brand" href="index.html"><img src="assets/icons/radar.svg" alt="" width="40" height="40"><span><strong>DZ <span>Air & Sea</span> Radar</strong><small>اكتشف الأفق من مكان واحد</small></span></a><p>مشروع لاستكشاف الملاحة الجوية والبحرية، مع التركيز على الجزائر.</p></div><nav aria-label="روابط التذييل"><a href="index.html">الرئيسية</a><a href="airports.html">المطارات</a><a href="ports.html">الموانئ</a><a href="about.html">عن المنصة</a></nav></div><div class="container footer-bottom"><span>© <span class="current-year">2026</span> DZ Air & Sea Radar</span><span>معلومات عامة وليست نظامًا ملاحيًا معتمدًا.</span></div></footer>
+<footer class="site-footer"><div class="container footer-top"><div><a class="brand footer-brand" href="index.html"><img src="assets/icons/radar.svg" alt="" width="40" height="40"><span><strong>DZ <span>Air & Sea</span> Radar</strong><small>اكتشف الأفق من مكان واحد</small></span></a><p>مشروع لاستكشاف الملاحة الجوية والبحرية، مع التركيز على الجزائر.</p></div><nav aria-label="روابط التذييل"><a href="index.html">الرئيسية</a><a href="airports.html">المطارات</a><a href="ports.html">الموانئ</a><a href="favorites.html">المفضلة</a><a href="about.html">عن المنصة</a></nav></div><div class="container footer-bottom"><span>© <span class="current-year">2026</span> DZ Air & Sea Radar</span><span>معلومات عامة وليست نظامًا ملاحيًا معتمدًا.</span></div></footer>
 </body></html>

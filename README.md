@@ -98,3 +98,13 @@ sitemap.xml
 Cloudflare Worker uploaded and workers.dev route enabled: https://dz-air-sea-aircraft-api.imadtbn-prayer.workers.dev/health . Health endpoint was verified via a remote browser and returned `{ "status": "ready", "upstream_enabled": false }`. Upstream data forwarding remains **disabled pending explicit production-use permission**. Website is not configured to use this Worker yet; the live ADSB.lol browser endpoint still displays an unavailable-data error in the tested sessions. Cloudflare remote browser successfully loaded the site/map at 390×844 mobile and 1440×900 desktop viewports, but aircraft requests failed; no real aircraft markers were confirmed. A request for permitted use has been saved as a Gmail draft addressed to info@adsb.lol and has NOT been sent.
 
 Do not claim the aircraft radar is production-ready until the provider grants permission, Worker is activated, and API payloads are verified end-to-end from mobile and desktop.
+
+
+## توسعات المرحلة الثالثة إلى السادسة
+
+- إضافة مستقبل AISStream دائم اختياري في `marine-relay/` ومواقع السفن عبر `assets/js/marine.js` مع انتهاء صلاحية موقع السفينة بعد 15 دقيقة. **لم يتم التفعيل**: مفتاح API/خادم دائم وإذن الاستخدام التجاري إن لزم.
+- إضافة صفحة `favorites.html` لحفظ المطارات والموانئ محليًا في المتصفح وإزالة المفضلة والبحث فيها.
+- دعم زر مشاركة الصفحة، وظهور زر تثبيت PWA عندما يوفره المتصفح، وملفات `manifest.webmanifest` و`sw.js` للصفحات الثابتة فقط.
+- جميع عمليات الجلب الحي خارج Service Worker cache؛ تجنب عرض مواقع قديمة دون تحديث.
+- أكواد AIS تجريبية: يلزم اختبار تطابق الرسائل مع شكل بيانات المصدر الفعلي بعد الحصول على مفتاح صالح.
+- جودة تغطية الموانئ والطقس والرصد البحري العالمي تحتاج مصادر وإعدادات إضافية، وليست مفعلة بعد.

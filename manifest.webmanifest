@@ -1,0 +1,35 @@
+{
+  "id": "./",
+  "name": "DZ Air & Sea Radar — الرادار الجزائري",
+  "short_name": "DZ Radar",
+  "description": "استكشف المواقع المرجعية والرصد الجوي والبحري المتاح في الجزائر والعالم",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#07121f",
+  "theme_color": "#081524",
+  "icons": [
+    {
+      "src": "./assets/icons/radar.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "الرادار",
+      "url": "./index.html#radar"
+    },
+    {
+      "name": "المطارات",
+      "url": "./airports.html"
+    },
+    {
+      "name": "الموانئ",
+      "url": "./ports.html"
+    }
+  ]
+}

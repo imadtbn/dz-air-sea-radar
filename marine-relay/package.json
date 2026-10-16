@@ -1,0 +1,16 @@
+{
+  "name": "dz-air-sea-ais-relay",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Single-stream server-side AISStream receiver; requires secret",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server.mjs"
+  },
+  "dependencies": {
+    "ws": "^8.18.3"
+  }
+}

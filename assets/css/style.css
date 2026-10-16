@@ -45,3 +45,18 @@
 @media(max-width:690px){.air-dashboard{padding:9px 11px}.map-legend{gap:7px;flex-wrap:wrap}}
 
 .aircraft-marker{position:relative}.aircraft-marker::after{content:"";position:absolute;inset:0;pointer-events:none}.aircraft-marker{font-size:0}.aircraft-marker::before{content:"✈";font-size:17px;display:block;transform:rotate(var(--air-bearing,0deg))}
+
+/* Marine layer, favorites, share and PWA actions */
+.sea-dashboard{padding:11px 13px;background:linear-gradient(145deg,#123a41,#0a2835);border-bottom:1px solid var(--line);flex-shrink:0}
+.sea-dashboard[hidden]{display:none!important}.sea-dashboard p{font-size:10px;margin:6px 0;color:#c0d8df}
+.sea-dashboard .air-dashboard-head strong{color:var(--sea)}
+.legend-dot.vessel{background:var(--sea)}
+.vessel-marker{width:30px;height:30px;border:2px solid #72ddd0;border-radius:50%;background:#0a595b;color:white;display:grid;place-items:center;cursor:pointer;box-shadow:0 3px 12px #061523b3;font-size:17px}
+.vessel-marker:hover{background:#117f80}.marine-popup h3{font-size:13px;margin:0 0 4px}
+.marine-popup small{font-size:10px;color:var(--muted)}
+.directory-controls{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:auto}
+.favorite-toggle{height:37px;width:37px;border:1px solid var(--line);border-radius:10px;color:#a5b8c5;background:transparent;display:grid;place-items:center}
+.favorite-toggle:hover,.favorite-toggle.is-favorite{color:var(--gold);border-color:var(--line-strong);background:rgba(224,185,97,.09)}
+.favorite-toggle.is-favorite svg{fill:rgba(224,185,97,.25)}
+.header-share,.header-install{color:var(--gold)}.header-install[hidden]{display:none!important}
+@media(max-width:690px){.header-share,.header-install{width:35px;height:35px}.header-actions{gap:6px}.brand strong{font-size:14px}}
