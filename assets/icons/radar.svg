@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-label="DZ Air and Sea Radar logo">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#112c45"/><stop offset="1" stop-color="#061523"/></linearGradient><linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f4d88f"/><stop offset="1" stop-color="#d3a750"/></linearGradient></defs>
+<rect width="256" height="256" rx="57" fill="url(#bg)"/>
+<rect x="7" y="7" width="242" height="242" rx="50" fill="none" stroke="#e0b961" stroke-opacity=".32" stroke-width="2"/>
+<circle cx="128" cy="128" r="87" fill="none" stroke="#4ca5be" stroke-opacity=".52" stroke-width="3"/>
+<circle cx="128" cy="128" r="58" fill="none" stroke="#4ca5be" stroke-opacity=".35" stroke-width="3"/>
+<circle cx="128" cy="128" r="30" fill="none" stroke="#4ca5be" stroke-opacity=".29" stroke-width="2"/>
+<path d="M128 128 184 61A87 87 0 0 1 215 128Z" fill="#63d3cb" opacity=".17"/>
+<path d="M128 128 184 61" stroke="#76dace" stroke-width="3" stroke-linecap="round" opacity=".65"/>
+<path d="m92 87 24-11 11-23c2-5 6-7 10-7 5 0 7 4 5 9l-10 27 17 15 13-3 6 5-16 9-5 19-6-6-1-15-19-13-25 13z" fill="url(#gold)"/>
+<path d="M81 163h94l-9 18-38 16-37-16z" fill="#71d2d0"/><path d="M94 162v-15h22v-15h23v30" fill="none" stroke="#71d2d0" stroke-width="8" stroke-linejoin="round"/>
+<path d="M74 205c12-7 20-7 32 0s20 7 32 0 20-7 32 0 20 7 32 0" fill="none" stroke="#e0b961" stroke-width="5" stroke-linecap="round"/>
+</svg>

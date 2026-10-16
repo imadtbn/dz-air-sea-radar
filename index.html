@@ -1,1 +1,139 @@
-i
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#081524">
+  <meta name="description" content="DZ Air & Sea Radar: منصة جزائرية لاستكشاف خرائط الملاحة الجوية والبحرية والمطارات والموانئ. تتبع الحركة المباشرة قيد التطوير.">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ar_DZ">
+  <meta property="og:title" content="DZ Air & Sea Radar | الرادار الجوي والبحري الجزائري">
+  <meta property="og:description" content="استكشف المطارات والموانئ الجزائرية على خريطة تفاعلية. الإصدار التأسيسي، دون بيانات حركة حية حتى الآن.">
+  <meta property="og:url" content="https://imadtbn.github.io/dz-air-sea-radar/">
+  <link rel="canonical" href="https://imadtbn.github.io/dz-air-sea-radar/">
+  <link rel="icon" href="assets/icons/radar.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://tiles.openfreemap.org" crossorigin>
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.css">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <title>DZ Air & Sea Radar | الرادار الجوي والبحري الجزائري</title>
+  <script src="assets/js/site.js" defer></script>
+  <script type="module" src="assets/js/radar.js"></script>
+</head>
+<body data-page="home">
+<a class="skip-link" href="#main">تجاوز إلى المحتوى</a>
+<header class="site-header" id="siteHeader">
+  <div class="container header-inner">
+    <a class="brand" href="index.html" aria-label="DZ Air & Sea Radar — الصفحة الرئيسية">
+      <span class="brand-symbol" aria-hidden="true"><img src="assets/icons/radar.svg" alt="" width="42" height="42"></span>
+      <span><strong>DZ <span>Air & Sea</span> Radar</strong><small>الرادار الجزائري للملاحة الجوية والبحرية</small></span>
+    </a>
+    <nav class="site-nav" id="mainNav" aria-label="التنقل الرئيسي">
+      <a class="active" aria-current="page" href="index.html"><span data-icon="home"></span>الرئيسية</a>
+      <a href="index.html#radar"><span data-icon="radar"></span>الخريطة</a>
+      <a href="airports.html"><span data-icon="plane"></span>المطارات</a>
+      <a href="ports.html"><span data-icon="ship"></span>الموانئ</a>
+      <a href="about.html"><span data-icon="info"></span>عن المنصة</a>
+    </nav>
+    <div class="header-actions">
+      <a class="header-link" href="index.html#radar"><span data-icon="map"></span><span>استكشف الرادار</span></a>
+      <button class="menu-toggle icon-button" id="menuToggle" type="button" aria-label="فتح القائمة" aria-controls="mainNav" aria-expanded="false"><span data-icon="menu"></span></button>
+    </div>
+  </div>
+</header>
+<main id="main">
+  <section class="hero">
+    <div class="container hero-grid">
+      <div class="hero-content">
+        <div class="eyebrow"><span class="pulse-dot"></span> النسخة التأسيسية <span class="eyebrow-divider"></span> مرحلة 01 / 06</div>
+        <h1>العالم أمامك.<br><em>جوًّا وبحرًا.</em></h1>
+        <p class="hero-description">نافذتك الجزائرية لاستكشاف الملاحة الجوية والبحرية على خريطة تفاعلية واحدة. ابدأ بالمطارات والموانئ، واستعد لتتبع الحركة المرصودة في المراحل القادمة.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#radar"><span data-icon="radar"></span>استكشف الخريطة<span data-icon="arrow-left"></span></a>
+          <a class="btn btn-outline" href="about.html"><span data-icon="compass"></span>تعرّف على المشروع</a>
+        </div>
+        <div class="hero-trust"><span data-icon="shield-check"></span> بيانات مواقع مرجعية ثابتة، وليست تتبعًا مباشرًا للطائرات أو السفن.</div>
+      </div>
+      <div class="hero-visual" aria-hidden="true">
+        <div class="orbital orbital-one"></div><div class="orbital orbital-two"></div><div class="orbital orbital-three"></div>
+        <div class="radar-sweep"></div>
+        <div class="globe"><span class="globe-meridian"></span><span class="globe-equator"></span><span class="globe-cross"></span></div>
+        <div class="orbit-point point-one"><span data-icon="plane"></span></div>
+        <div class="orbit-point point-two"><span data-icon="ship"></span></div>
+        <div class="visual-label visual-label-one">AIRSPACE <span>01</span></div>
+        <div class="visual-label visual-label-two">MARITIME <span>02</span></div>
+      </div>
+    </div>
+    <div class="container hero-metrics" aria-label="معلومات الإصدار الحالي">
+      <div><span class="metric-icon" data-icon="map-pin"></span><strong id="heroPlaceCount">—</strong><small>موقعًا مرجعيًا على الخريطة</small></div>
+      <div><span class="metric-icon" data-icon="layers"></span><strong>02</strong><small>نوعا ملاحة للاستكشاف</small></div>
+      <div><span class="metric-icon" data-icon="globe"></span><strong>عالمي</strong><small>نطاق الخريطة التفاعلية</small></div>
+      <div><span class="metric-icon" data-icon="activity"></span><strong>01/06</strong><small>مرحلة تطوير مكتملة</small></div>
+    </div>
+  </section>
+  <section class="section radar-section" id="radar" aria-labelledby="radarHeading">
+    <div class="container">
+      <div class="section-heading">
+        <div><span class="kicker"><span data-icon="radar"></span> مركز الاستكشاف</span><h2 id="radarHeading">الرادار التفاعلي</h2><p>استكشف المطارات والموانئ على الخريطة، أو انتقل لأي منطقة في العالم.</p></div>
+        <div class="status-badge"><span class="status-dot amber"></span> نقاط مرجعية ثابتة <span class="tiny-separator">•</span> لا يوجد بث مباشر بعد</div>
+      </div>
+      <div class="map-shell" id="mapShell">
+        <div class="map-topbar">
+          <div class="mode-switch" role="group" aria-label="تحديد نوع المواقع">
+            <button type="button" data-mode="both" class="mode-button is-active" aria-pressed="true"><span data-icon="layers"></span> الكل</button>
+            <button type="button" data-mode="air" class="mode-button" aria-pressed="false"><span data-icon="plane"></span> الجوي</button>
+            <button type="button" data-mode="sea" class="mode-button" aria-pressed="false"><span data-icon="ship"></span> البحري</button>
+          </div>
+          <div class="toolbar-actions">
+            <button type="button" class="map-text-button" id="algeriaView"><span data-icon="map-pin"></span>الجزائر</button>
+            <button type="button" class="map-text-button" id="worldView"><span data-icon="globe"></span>العالم</button>
+            <button type="button" class="icon-button" id="fullscreenButton" aria-label="تكبير الخريطة إلى الشاشة كاملة" title="تكبير الخريطة"><span data-icon="maximize"></span></button>
+          </div>
+        </div>
+        <div class="map-layout">
+          <aside class="map-sidebar" aria-label="البحث عن موقع مرجعي">
+            <div class="sidebar-heading"><div><span class="sidebar-overline">الدليل الجغرافي</span><h3>اكتشف المواقع</h3></div><span class="sidebar-count" id="locationCount">—</span></div>
+            <label for="mapSearch" class="sr-only">ابحث عن مطار أو ميناء أو مدينة</label>
+            <div class="search-field"><span data-icon="search"></span><input id="mapSearch" type="search" autocomplete="off" placeholder="ابحث عن مطار، ميناء أو مدينة…"></div>
+            <p class="sidebar-hint">اختر موقعًا للانتقال إليه وإظهار معلوماته.</p>
+            <div class="reference-list" id="referenceList" aria-live="polite"><p class="muted empty-message">جارٍ تجهيز المواقع المرجعية…</p></div>
+            <div class="sidebar-note"><span data-icon="info"></span><p>المؤشرات المعروضة تمثل مطارات وموانئ، وليس مواقع طائرات أو سفن متحركة.</p></div>
+          </aside>
+          <div class="map-frame">
+            <div id="map" role="region" aria-label="خريطة تفاعلية للمطارات والموانئ في الجزائر والعالم"></div>
+            <div class="map-loading" id="mapLoading" role="status"><span class="loading-radar"></span><strong>جاري تهيئة الخريطة…</strong><small>تتطلب الخريطة اتصالًا بالإنترنت لدعم الخرائط المفتوحة.</small></div>
+            <div class="map-error" id="mapError" role="alert" hidden><span data-icon="alert-triangle"></span><strong>تعذر تحميل الخريطة.</strong><p>تحقق من اتصال الإنترنت ثم أعد المحاولة.</p><button type="button" class="btn btn-outline btn-small" id="retryMap">إعادة المحاولة</button></div>
+            <div class="map-quick-controls">
+              <button type="button" class="map-control-button" id="locateButton" title="موقعي الحالي" aria-label="الانتقال إلى موقعي"><span data-icon="locate"></span></button>
+              <button type="button" class="map-control-button" id="zoomIn" title="تكبير" aria-label="تكبير الخريطة"><span data-icon="plus"></span></button>
+              <button type="button" class="map-control-button" id="zoomOut" title="تصغير" aria-label="تصغير الخريطة"><span data-icon="minus"></span></button>
+            </div>
+            <div class="map-legend"><span><i class="legend-dot air"></i> مطار</span><span><i class="legend-dot sea"></i> ميناء</span></div>
+            <div class="map-geo-msg" id="geoMessage" role="status" aria-live="polite" hidden></div>
+          </div>
+        </div>
+        <div class="map-footer"><span><span data-icon="info"></span> بيانات الموقع الثابتة لأغراض الاستكشاف، ولا تُستخدم للملاحة أو السلامة.</span><span class="map-credit">MapLibre · OpenFreeMap</span></div>
+      </div>
+    </div>
+  </section>
+  <section class="section" id="explore">
+    <div class="container">
+      <div class="section-heading"><div><span class="kicker">استكشف المجالين</span><h2>مساران. منصة واحدة.</h2><p>دليل واضح وتصفح سريع بحسب اهتماماتك.</p></div></div>
+      <div class="feature-grid">
+        <a class="feature-card air-card" href="airports.html"><span class="feature-number">01 / AIR</span><span class="feature-icon" data-icon="plane"></span><h3>الملاحة الجوية</h3><p>مواقع المطارات الجزائرية، رموز IATA وICAO، وبنية جاهزة لإضافة تتبع الرحلات.</p><span class="feature-link">استكشف المطارات <span data-icon="arrow-left"></span></span></a>
+        <a class="feature-card sea-card" href="ports.html"><span class="feature-number">02 / SEA</span><span class="feature-icon" data-icon="ship"></span><h3>الملاحة البحرية</h3><p>دليل الموانئ الجزائرية ومواقعها التقريبية وبنية جاهزة لتلقي بيانات AIS.</p><span class="feature-link">استكشف الموانئ <span data-icon="arrow-left"></span></span></a>
+      </div>
+    </div>
+  </section>
+  <section class="section roadmap-preview">
+    <div class="container roadmap-preview-inner">
+      <div><span class="kicker">قيد التطوير</span><h2>أساس متين اليوم.<br>رادار مباشر غدًا.</h2><p>اكتملت واجهة الخرائط ودليل المواقع. المرحلة القادمة مخصصة لربط بيانات الطائرات المرصودة، ثم السفن.</p><a class="btn btn-outline" href="about.html#roadmap">اطّلع على مراحل المشروع <span data-icon="arrow-left"></span></a></div>
+      <div class="roadmap-compact">
+        <div class="roadmap-step complete"><span>01</span><div><strong>الهوية والخرائط</strong><small>النسخة التأسيسية</small></div><span data-icon="check-circle"></span></div>
+        <div class="roadmap-step"><span>02</span><div><strong>تتبع الطائرات</strong><small>الربط بمصدر ADS-B</small></div><span data-icon="clock"></span></div>
+        <div class="roadmap-step"><span>03</span><div><strong>تتبع السفن</strong><small>بيانات AIS اللحظية</small></div><span data-icon="clock"></span></div>
+      </div>
+    </div>
+  </section>
+</main>
+<footer class="site-footer"><div class="container footer-top"><div><a class="brand footer-brand" href="index.html"><img src="assets/icons/radar.svg" alt="" width="40" height="40"><span><strong>DZ <span>Air & Sea</span> Radar</strong><small>اكتشف الأفق من مكان واحد</small></span></a><p>مشروع لاستكشاف الملاحة الجوية والبحرية، مع التركيز على الجزائر.</p></div><nav aria-label="روابط التذييل"><a href="index.html">الرئيسية</a><a href="airports.html">المطارات</a><a href="ports.html">الموانئ</a><a href="about.html">عن المنصة</a></nav></div><div class="container footer-bottom"><span>© <span class="current-year">2026</span> DZ Air & Sea Radar</span><span>معلومات عامة وليست نظامًا ملاحيًا معتمدًا.</span></div></footer>
+</body></html>
