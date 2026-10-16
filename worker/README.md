@@ -15,3 +15,9 @@ Do not enable a public relay until ADSB.lol permits the production/redistributio
 - During disabled mode the website can retain the direct-client source for browser compatibility testing; this does **not** imply public production approval.
 
 Inspect and comply with https://api.adsb.lol/docs and https://www.adsb.lol/terms/ before publication. Source attribution: ADSB.lol, ODbL 1.0.
+
+## Test and deployment status — 2026-10-16
+
+Cloudflare Worker uploaded and workers.dev route enabled: https://dz-air-sea-aircraft-api.imadtbn-prayer.workers.dev/health . Health endpoint was verified via a remote browser and returned `{ "status": "ready", "upstream_enabled": false }`. Upstream data forwarding remains **disabled pending explicit production-use permission**. Website is not configured to use this Worker yet; the live ADSB.lol browser endpoint still displays an unavailable-data error in the tested sessions. Cloudflare remote browser successfully loaded the site/map at 390×844 mobile and 1440×900 desktop viewports, but aircraft requests failed; no real aircraft markers were confirmed. A request for permitted use has been saved as a Gmail draft addressed to info@adsb.lol and has NOT been sent.
+
+Do not claim the aircraft radar is production-ready until the provider grants permission, Worker is activated, and API payloads are verified end-to-end from mobile and desktop.
