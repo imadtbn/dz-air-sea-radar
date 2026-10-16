@@ -84,9 +84,9 @@ async function start(){
 }
 start();
 // Phase 2: live observed aircraft. No fabricated tracks; fetch is throttled per tab.
-// ADSB.lol radius endpoint uses nautical miles. Browser requests require upstream CORS.
+// Uses permission-gated Cloudflare Worker only, with source-specific attribution and cache-age correction.
 const aircraftMarkers=new Map();let aircraft=[],lastFetch=0,airSeq=0,airFailedUntil=0;
-const AIR_URL="https://api.adsb.lol/v2/lat/";
+const AIR_SOURCE_NAMES={"adsb.lol":"ADSB.lol","adsb.fi":"adsb.fi"};
 const num=v=>typeof v==="number"&&Number.isFinite(v);
 const speed=v=>num(v)?Math.round(v*1.852)+" كم/سا":"غير متاح";
 const height=v=>v==="ground"?"على الأرض":num(v)?Math.round(v*0.3048)+" م":"غير متاح";
@@ -94,7 +94,7 @@ const bearing=v=>num(v)?Math.round((v+360)%360)+"°":"غير متاح";
 function flightCard(p){
  const box=document.createElement("div");box.className="flight-popup";box.dir="rtl";
  const title=document.createElement("h3");title.textContent=p.flight||p.hex;
- const subtitle=document.createElement("p");subtitle.textContent="ADS-B.lol · "+p.hex.toUpperCase();
+ const subtitle=document.createElement("p");subtitle.textContent=(AIR_SOURCE_NAMES[p.provider]||"ADS-B")+" · "+p.hex.toUpperCase();
  box.append(title,subtitle);
  [["السرعة",speed(p.gs)],["الارتفاع",height(p.alt_baro??p.alt_geom)],["الاتجاه",bearing(p.track)],["آخر رصد",Math.round(p.seen)+" ثانية"]].forEach(([name,value])=>{
  const line=document.createElement("div");line.className="flight-line";
@@ -141,27 +141,35 @@ async function refreshFlights(){
  const id=++airSeq,center=map.getCenter();
  if(Math.abs(center.lat)>89)return;
  showAirStatus("جارٍ جلب الرصد حول مركز الخريطة…");
- const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),12000);
+ const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),17000);
  try{
-  const gateway=window.DZ_AIR_API || "";
-  const url=gateway ? gateway+"?lat="+encodeURIComponent(center.lat.toFixed(3))+"&lon="+encodeURIComponent(center.lng.toFixed(3)) : AIR_URL+center.lat.toFixed(3)+"/lon/"+center.lng.toFixed(3)+"/dist/250";
+  const gateway=typeof window.DZ_AIR_API==="string"?window.DZ_AIR_API.trim():"";
+  if(!/^https:\/\//.test(gateway))throw Error("MISSING_GATEWAY");
+  const url=gateway+"?lat="+encodeURIComponent(center.lat.toFixed(3))+"&lon="+encodeURIComponent(center.lng.toFixed(3));
   const response=await fetch(url,{signal:controller.signal,cache:"no-store",headers:{Accept:"application/json"}});
   if(!response.ok){
    if(response.status===503){const detail=await response.json().catch(()=>({}));if(detail.error==="UPSTREAM_NOT_AUTHORIZED")throw Error("UPSTREAM_NOT_AUTHORIZED");}
    throw Error("ADS-B HTTP "+response.status);
   }
   const payload=await response.json();if(id!==airSeq)return;
-  if(!Array.isArray(payload.ac))throw Error("Invalid ADS-B payload");
+  if(!Array.isArray(payload.ac)||!AIR_SOURCE_NAMES[payload.source]||!num(payload.now))throw Error("Invalid ADS-B payload");
   airFailedUntil=0;
-  aircraft=payload.ac.filter(p=>typeof p.hex==="string"&&num(p.lat)&&num(p.lon)&&num(p.seen_pos??p.seen)&&(p.seen_pos??p.seen)<=120&&(p.seen_pos??p.seen)>=0).slice(0,350).map(p=>({...p,flight:String(p.flight||"").trim().slice(0,20),seen:p.seen_pos??p.seen}));
+  // seen is relative to the upstream snapshot; account for origin and edge cache delay.
+  const snapshotDelay=Math.max(0,Date.now()/1000-payload.now);
+  aircraft=payload.ac.filter(p=>typeof p.hex==="string"&&num(p.lat)&&num(p.lon)&&num(p.seen_pos??p.seen)&&(p.seen_pos??p.seen)+snapshotDelay<=120&&(p.seen_pos??p.seen)>=0).slice(0,350).map(p=>({...p,provider:payload.source,flight:String(p.flight||"").trim().slice(0,20),seen:(p.seen_pos??p.seen)+snapshotDelay}));
   renderFlights();
-  $("airUpdated").textContent="آخر جلب: "+new Date().toLocaleTimeString("ar-DZ");
-  showAirStatus("رُصدت "+aircraft.length+" طائرة ضمن 250 ميلًا بحريًا من مركز الخريطة",true);
+  const provider=payload.source,sourceNode=$("airSource");
+  sourceNode.textContent="المصدر: "+AIR_SOURCE_NAMES[provider]+" · "+(payload.license||"");
+  sourceNode.href=provider==="adsb.lol"?"https://www.adsb.lol/":"https://adsb.fi/";
+  $("airUpdated").textContent="وقت الرصد: "+new Date(payload.now*1000).toLocaleTimeString("ar-DZ");
+  showAirStatus("رُصدت "+aircraft.length+" طائرة ضمن 250 ميلًا بحريًا من مركز الخريطة · "+AIR_SOURCE_NAMES[provider],true);
  }catch(error){
   if(id!==airSeq)return;
   aircraft=[];renderFlights();$("airCount").textContent="—";
-  airFailedUntil=Date.now()+5*60*1000;
-  showAirStatus(error.message==="UPSTREAM_NOT_AUTHORIZED"?"الرادار الجوي متوقف إلى حين السماح بالاستخدام العام من مزوّد ADS-B.":"تعذر الاتصال بمصدر الطائرات؛ أوقفنا المحاولات التلقائية 5 دقائق لحماية الخدمة. راجع فحص الاتصال.");
+  airFailedUntil=Date.now()+(error.message==="UPSTREAM_NOT_AUTHORIZED"?15:5)*60*1000;
+  $("airSource").textContent="المصدر: غير متصل";
+  $("airSource").removeAttribute("href");
+  showAirStatus(error.message==="UPSTREAM_NOT_AUTHORIZED"?"مصادر الرادار الجوي غير مفعّلة إلى حين تأكيد السماح بإعادة العرض العام.":error.message==="MISSING_GATEWAY"?"لم يتم ضبط وسيط API الآمن.":"مصدر بيانات الطائرات غير متاح حاليًا؛ ستعاد المحاولة تلقائيًا بعد فترة توقف. راجع فحص الاتصال.");
   console.warn(error);
  }finally{clearTimeout(timeout);}
 }

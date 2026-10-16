@@ -26,7 +26,7 @@ const probes=[
  {id:"worker",title:"اتصال Cloudflare Worker",run:async()=>{
    const result=await getJSON(airWorker+"/health");
    if(result.status!=="ready")throw Error("رد غير متوقع من وسيط API");
-   return result.upstream_enabled===true?"الخدمة تعمل، والاتصال بالمصدر مفعّل (تحقق من ترخيص الاستخدام).":"الخدمة تعمل، لكن إعادة بث ADS-B معطلة لحين الإذن.";
+   return (result.providers?.adsblol||result.providers?.adsbfi)?"الخدمة تعمل مع المصادر المسموح بها.":"الخدمة تعمل، لكن إعادة بث ADS-B معطلة لحين تأكيد شروط المصادر.";
  }},
  {id:"weather",title:"بيانات METAR — مطار الجزائر",run:async()=>{
    const result=await getJSON(airWorker+"/api/metar?icao=DAAG");
@@ -36,7 +36,7 @@ const probes=[
  }},
  {id:"air",title:"حالة مصدر الطائرات",run:async()=>{
    const result=await getJSON(airWorker+"/health");
-   if(result.upstream_enabled!==true)return "الاتصال ADS-B غير مفعّل في الوسيط. لا يعني ذلك أن هناك طائرات على الخريطة.";
+   if(!result.providers?.adsblol&&!result.providers?.adsbfi)return "مصدرا ADS-B غير مفعّلين بعد؛ لا تُعرض مواقع حية حتى التحقق من السماح بالاستخدام العام.";
    return "الاتصال مفعّل؛ يلزم اختبار عينة حقيقية قبل إعلان اكتمال الرادار.";
  }},
  {id:"marine",title:"حالة استقبال AIS",run:async()=>{
@@ -68,7 +68,7 @@ async function runTests(){
  for(const p of probes){
   const {article,status}=rows.get(p.id);
   article.dataset.state="busy";status.textContent="جارٍ الاتصال…";
-  try{const message=await p.run();article.dataset.state=(p.id==="air"&&message.startsWith("الاتصال ADS-B غير"))||(p.id==="marine"&&message.startsWith("غير مفعّل"))||(p.id==="pwa"&&message.startsWith("تم بدء تسجيل PWA"))?"pending":"ok";status.textContent=message;}
+  try{const message=await p.run();article.dataset.state=(p.id==="air"&&message.startsWith("مصدرا ADS-B غير"))||(p.id==="marine"&&message.startsWith("غير مفعّل"))||(p.id==="pwa"&&message.startsWith("تم بدء تسجيل PWA"))?"pending":"ok";status.textContent=message;}
   catch(e){article.dataset.state="error";status.textContent="تعذر الفحص: "+(e.name==="AbortError"?"انتهت مهلة الاتصال":e.message||"خطأ غير معروف");}
  }
  start.disabled=false;start.textContent="إعادة الفحص";

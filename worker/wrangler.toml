@@ -6,3 +6,6 @@ workers_dev = true
 [vars]
 # Do NOT switch on before written permission from ADSB.lol for production relay.
 UPSTREAM_ALLOWED = "false"
+# Personal-use terms do not automatically permit redisplay to a public site.
+# Request explicit confirmation from adsb.fi before enabling this source.
+ADSBFI_ALLOWED = "false"

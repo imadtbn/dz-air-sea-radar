@@ -26,3 +26,15 @@ Do not claim the aircraft radar is production-ready until the provider grants pe
 ## Weather API
 
 `GET /api/metar?icao=DAAG` (DAAG, DAOO, DABC, DABB, DAAE, DAON) retrieves a METAR JSON observation from Aviation Weather Center with a 10-minute edge cache, validated ICAO and sanitized data. Weather works even while aircraft upstream is disabled, subject to real upstream availability. Credit: Aviation Weather Center; see https://aviationweather.gov/data/api/ (100 requests/minute upstream limit).
+
+
+## Two upstream sources, gated independently
+
+- `UPSTREAM_ALLOWED=false` — ADSB.lol v2 primary; ODbL 1.0. Confirm the production application with the operator.
+- `ADSBFI_ALLOWED=false` — adsb.fi OpenData v3 fallback; *personal non-commercial*; **do not enable for a public redisplay site without permission**.
+- Fallback only after server timeout/429/5xx/invalid or stale responses. Do not try to bypass primary 400/401/403 errors.
+- Data returned includes `source`, `attribution`, `license`, `now`, `retrievedAt` and `ac`, so UI can credit the correct data provider and adjust aircraft freshness.
+- Local-per-Colo Cache API TTL 60 seconds with 0.25° geo bucketing and a provider-permission-scoped cache key.
+- Neither provider is contacted while both permission flags are false.
+
+To authorize after verifying terms, change the relevant variable in `worker/wrangler.toml` and deploy. **Do not publish a key or token in the frontend.**

@@ -86,3 +86,5 @@
 .diagnostic-item[data-state="pending"] h3{color:var(--gold)}
 .diagnostic-checked{color:var(--muted);font-size:11px;margin-top:16px}
 @media(max-width:690px){.diagnostic-head{align-items:flex-start;flex-direction:column}.diagnostic-grid{grid-template-columns:1fr}}
+
+.air-source-row{margin:5px 0;color:var(--muted);font-size:10px;line-height:1.5}.air-source-row a[href]{color:var(--gold);text-decoration:underline;text-underline-offset:3px}
