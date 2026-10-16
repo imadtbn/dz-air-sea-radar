@@ -60,3 +60,14 @@
 .favorite-toggle.is-favorite svg{fill:rgba(224,185,97,.25)}
 .header-share,.header-install{color:var(--gold)}.header-install[hidden]{display:none!important}
 @media(max-width:690px){.header-share,.header-install{width:35px;height:35px}.header-actions{gap:6px}.brand strong{font-size:14px}}
+
+/* METAR modal — report is informational and may be unavailable */
+.weather-trigger{background:rgba(101,213,206,.07);border:1px solid rgba(101,213,206,.26);color:var(--sea);border-radius:8px;padding:6px 9px;font-size:10px;font-weight:800}
+.weather-trigger:hover{background:rgba(101,213,206,.16)}
+.directory-controls{flex-wrap:wrap;gap:8px}.directory-go{margin-top:0}
+.weather-dialog{background:#0d263a;color:var(--text);border:1px solid var(--line-strong);border-radius:19px;padding:24px;width:min(500px,calc(100% - 26px));max-height:min(82vh,800px);overflow:auto;box-shadow:var(--shadow);font:inherit}
+.weather-dialog::backdrop{background:rgba(0,11,19,.78)}.weather-dialog h2{font-size:20px;margin:12px 0}.weather-dialog>p{font-size:11px;color:var(--muted)}
+.weather-close{float:left;background:rgba(224,185,97,.09);color:var(--gold);border:1px solid var(--line-strong);border-radius:8px;padding:4px 12px;font-size:11px}
+.weather-rows{margin:15px 0;display:grid;gap:6px}.weather-rows>div{display:flex;justify-content:space-between;gap:14px;border-bottom:1px solid var(--line);font-size:12px;padding:5px 0}
+.weather-rows dt{color:var(--muted)}.weather-rows dd{margin:0;font-weight:800;color:var(--text)}
+.weather-raw{direction:ltr;text-align:left;white-space:pre-wrap;overflow-wrap:anywhere;font-size:11px;padding:12px;background:#07121f;border-radius:9px;color:var(--gold-light)}.weather-credit{font-size:10px!important}
