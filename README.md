@@ -65,3 +65,7 @@ npm test
 - [Aviation Weather Center](https://aviationweather.gov/data/api/) — METAR؛ بحد مصدر 100 طلب في الدقيقة.
 - [OurAirports](https://ourairports.com/data/) — بيانات مطارات مرجعية.
 - [OpenFreeMap](https://openfreemap.org/) و[MapLibre](https://maplibre.org/) — خريطة الأساس.
+
+## تصحيح ربط الرادار الجوي
+
+تم ربط الواجهة افتراضيًا بالوسيط المنشور `dz-air-sea-aircraft-api.imadtbn-prayer.workers.dev` بدلاً من استدعاء `api.adsb.lol` من كل متصفح. يبدأ الوسيط بالقيمة `UPSTREAM_ALLOWED=false` فلا يقدم بيانات حية أو يستدعي المصدر حتى الإذن. يعرض الموقع سبب الحجب عند رد `503 UPSTREAM_NOT_AUTHORIZED`، ويعمل تلقائيًا عبر التخزين المؤقت بعد تفعيل المصدر قانونيًا واختبار الخدمة. الطلبات غير المرخصة ليست قابلة للتجاوز من العميل.
