@@ -1,4 +1,5 @@
 import {searchPlaces} from "./places.js";
+import {showAirportWeather} from "./weather.js";
 const page=document.body.dataset.page;
 const type=page==="ports"?"sea":page==="favorites"?"both":"air";
 const search=document.getElementById("directorySearch");
@@ -22,7 +23,7 @@ function buildCard(place){
  const button=document.createElement("button");button.type="button";button.className="favorite-toggle";
  const apply=()=>{const yes=favorites().includes(place.id);button.classList.toggle("is-favorite",yes);button.setAttribute("aria-pressed",String(yes));button.setAttribute("aria-label",yes?"إزالة من المفضلة: "+place.name:"إضافة إلى المفضلة: "+place.name);button.replaceChildren(icon("heart"));window.renderSiteIcons?.(button);};
  button.addEventListener("click",()=>{const list=favorites();const next=list.includes(place.id)?list.filter(x=>x!==place.id):[...list,place.id];store(next);if(page==="favorites")render();else apply();});
- actions.append(link,button);card.append(head,tags,actions);apply();return card;
+ if(place.type==="air"&&place.secondaryCode){const weather=document.createElement("button");weather.type="button";weather.className="weather-trigger";weather.textContent="طقس المطار";weather.addEventListener("click",()=>showAirportWeather(place.secondaryCode,place.name));actions.append(weather);}actions.append(link,button);card.append(head,tags,actions);apply();return card;
 }
 function render(){
  const favs=favorites();
