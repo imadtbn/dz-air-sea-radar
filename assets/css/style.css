@@ -71,3 +71,18 @@
 .weather-rows{margin:15px 0;display:grid;gap:6px}.weather-rows>div{display:flex;justify-content:space-between;gap:14px;border-bottom:1px solid var(--line);font-size:12px;padding:5px 0}
 .weather-rows dt{color:var(--muted)}.weather-rows dd{margin:0;font-weight:800;color:var(--text)}
 .weather-raw{direction:ltr;text-align:left;white-space:pre-wrap;overflow-wrap:anywhere;font-size:11px;padding:12px;background:#07121f;border-radius:9px;color:var(--gold-light)}.weather-credit{font-size:10px!important}
+
+/* Self-check panel on mobile and desktop */
+.diagnostic-head{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:22px}
+.diagnostic-head h2{font-size:23px;margin:0 0 5px}.diagnostic-head p{font-size:12px;margin:0}
+.diagnostic-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.diagnostic-item{background:#0c2334;border:1px solid var(--line);border-radius:14px;padding:17px;min-height:112px}
+.diagnostic-item h3{font-size:14px;margin:0 0 7px}.diagnostic-message{font-size:11.5px;margin:0;line-height:1.85}
+.diagnostic-item[data-state="ok"]{border-color:rgba(101,213,206,.34)}
+.diagnostic-item[data-state="ok"] h3{color:var(--sea)}
+.diagnostic-item[data-state="error"]{border-color:rgba(238,134,112,.4)}
+.diagnostic-item[data-state="error"] h3{color:#f1a896}
+.diagnostic-item[data-state="pending"]{border-color:var(--line-strong)}
+.diagnostic-item[data-state="pending"] h3{color:var(--gold)}
+.diagnostic-checked{color:var(--muted);font-size:11px;margin-top:16px}
+@media(max-width:690px){.diagnostic-head{align-items:flex-start;flex-direction:column}.diagnostic-grid{grid-template-columns:1fr}}

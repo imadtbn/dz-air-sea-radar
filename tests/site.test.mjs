@@ -13,7 +13,7 @@ test("airport and port search works and no records have invalid coordinates",()=
  for(const p of places){assert.ok(Math.abs(p.lat)<=90);assert.ok(Math.abs(p.lng)<=180);}
 });
 test("all site pages expose navigation and PWA manifest",()=>{
- for(const page of ["index.html","airports.html","ports.html","about.html","favorites.html"]){
+ for(const page of ["index.html","airports.html","ports.html","about.html","favorites.html","diagnostics.html"]){
   const html=read(page);
   assert.match(html,/<html lang="ar" dir="rtl">/);
   assert.match(html,/manifest\.webmanifest/);
@@ -25,6 +25,12 @@ test("static assets named in service worker precache exist",()=>{
  const values=[...sw.matchAll(/"\.\/([^"]+)"/g)].map(match=>match[1]);
  for(const path of values){assert.ok(existsSync(new URL("../"+path,import.meta.url)),path);}
  assert.doesNotMatch(sw,/api\.adsb\.lol|aisstream\.io\/v0/);
+});
+test("diagnostic endpoints and safe defaults",()=>{
+ const script=read("assets/js/diagnostics.js");
+ assert.match(script,/api\/metar\?icao=DAAG/);
+ assert.match(script,/upstream_enabled/);
+ assert.match(read("assets/js/radar.js"),/airFailedUntil/);
 });
 test("marine stream key is never configured in frontend",()=>{
  const marine=read("assets/js/marine-config.js");

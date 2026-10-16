@@ -85,7 +85,7 @@ async function start(){
 start();
 // Phase 2: live observed aircraft. No fabricated tracks; fetch is throttled per tab.
 // ADSB.lol radius endpoint uses nautical miles. Browser requests require upstream CORS.
-const aircraftMarkers=new Map();let aircraft=[],lastFetch=0,airSeq=0;
+const aircraftMarkers=new Map();let aircraft=[],lastFetch=0,airSeq=0,airFailedUntil=0;
 const AIR_URL="https://api.adsb.lol/v2/lat/";
 const num=v=>typeof v==="number"&&Number.isFinite(v);
 const speed=v=>num(v)?Math.round(v*1.852)+" كم/سا":"غير متاح";
@@ -136,6 +136,7 @@ function showAirStatus(message,ok=false){
 }
 async function refreshFlights(){
  if(!ready||document.hidden||mode==="sea"||!$("airVisibility").checked)return;
+ if(Date.now()<airFailedUntil)return;
  if(Date.now()-lastFetch<60000)return;lastFetch=Date.now();
  const id=++airSeq,center=map.getCenter();
  if(Math.abs(center.lat)>89)return;
@@ -148,6 +149,7 @@ async function refreshFlights(){
   if(!response.ok)throw Error("ADS-B HTTP "+response.status);
   const payload=await response.json();if(id!==airSeq)return;
   if(!Array.isArray(payload.ac))throw Error("Invalid ADS-B payload");
+  airFailedUntil=0;
   aircraft=payload.ac.filter(p=>typeof p.hex==="string"&&num(p.lat)&&num(p.lon)&&num(p.seen_pos??p.seen)&&(p.seen_pos??p.seen)<=120&&(p.seen_pos??p.seen)>=0).slice(0,350).map(p=>({...p,flight:String(p.flight||"").trim().slice(0,20),seen:p.seen_pos??p.seen}));
   renderFlights();
   $("airUpdated").textContent="آخر جلب: "+new Date().toLocaleTimeString("ar-DZ");
@@ -155,7 +157,8 @@ async function refreshFlights(){
  }catch(error){
   if(id!==airSeq)return;
   aircraft=[];renderFlights();$("airCount").textContent="—";
-  showAirStatus("بيانات الطائرات غير متاحة؛ تحقق من الاتصال أو قيود CORS/المصدر.");
+  airFailedUntil=Date.now()+5*60*1000;
+  showAirStatus("تعذر الاتصال بمصدر الطائرات؛ أوقفنا المحاولات التلقائية 5 دقائق لحماية الخدمة. راجع فحص الاتصال.");
   console.warn(error);
  }finally{clearTimeout(timeout);}
 }
