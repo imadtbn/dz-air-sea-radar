@@ -1,5 +1,5 @@
-const STATIC_CACHE="dz-air-sea-static-v1";
-const PRECACHE=["./","./index.html","./airports.html","./ports.html","./about.html","./favorites.html","./assets/css/style.css","./assets/js/site.js","./assets/js/places.js","./assets/js/directory.js","./assets/js/radar.js","./assets/js/marine.js","./assets/js/marine-config.js","./assets/js/air-config.js","./assets/icons/radar.svg"];
+const STATIC_CACHE="dz-air-sea-static-v2";
+const PRECACHE=["./","./index.html","./airports.html","./ports.html","./about.html","./favorites.html","./assets/css/style.css","./assets/js/site.js","./assets/js/places.js","./assets/js/directory.js","./assets/js/radar.js","./assets/js/marine.js","./assets/js/marine-config.js","./assets/js/air-config.js","./assets/js/weather.js","./assets/icons/radar.svg"];
 self.addEventListener("install",event=>{event.waitUntil(caches.open(STATIC_CACHE).then(cache=>cache.addAll(PRECACHE)).then(()=>self.skipWaiting()));});
 self.addEventListener("activate",event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith("dz-air-sea-")&&k!==STATIC_CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});
 self.addEventListener("fetch",event=>{
